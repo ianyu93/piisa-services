@@ -1,0 +1,66 @@
+[tool.poetry]
+name = "piisa-services"
+version = "0.1.0"
+description = ""
+authors = ["Ian Yu <ian.yu@arc.com.co>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+common = { path = "src/common/", develop = true }
+piisa-presidio = { path = "src/piisa-presidio/", develop = true }
+piisa-transformers = { path = "src/piisa-transformers/", develop = true }
+
+[tool.poe.tasks.update]
+help = "Update lock files for all packages"
+shell = """
+    cd src 
+    for d in */ ; do
+        echo "Updating lock for $d"
+        cd $d
+        poetry lock
+        cd ..
+    done
+    cd ..
+    echo "Updating update for root"
+    poetry lock
+"""
+
+[tool.poe.tasks.build]
+help = "Run format, update, and export"
+shell = """
+    poe format
+    poe update
+    poe export
+"""
+
+[tool.poe.tasks.export]
+help = "Update lock files for all packages"
+shell = "bash scripts/export.sh"
+
+[tool.poe.tasks.format]
+help = "Run black on all packages"
+shell = "black src"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 120
+target-version = ['py310']
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
